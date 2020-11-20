@@ -6,25 +6,25 @@ public delegate void CountChangedHandler();
 public class CommandInvoker : MonoBehaviour
 {
     private Queue<ICommand> _commandBuffer;
-    private Stack<ICommand> _commandHistory;
-    private Stack<ICommand> _commandFuture;
+    private Stack<ICommand> _undoCommandStack;
+    private Stack<ICommand> _redoCommandStack;
 
     public event CountChangedHandler CountChanged;
 
     public int UndoCount
     {
-        get { return _commandHistory.Count; }
+        get { return _undoCommandStack.Count; }
     }
     public int RedoCount
     {
-        get { return _commandFuture.Count; }
+        get { return _redoCommandStack.Count; }
     }
 
     private void Awake()
     {
         _commandBuffer = new Queue<ICommand>();
-        _commandHistory = new Stack<ICommand>();
-        _commandFuture = new Stack<ICommand>();
+        _undoCommandStack = new Stack<ICommand>();
+        _redoCommandStack = new Stack<ICommand>();
     }
 
     void Update()
@@ -36,8 +36,8 @@ public class CommandInvoker : MonoBehaviour
 
             if (command.IsUndoable())
             {
-                _commandHistory.Push(command);
-                _commandFuture.Clear();
+                _undoCommandStack.Push(command);
+                _redoCommandStack.Clear();
             }
             else
             {
@@ -54,29 +54,29 @@ public class CommandInvoker : MonoBehaviour
 
     public void ResetHistory()
     {
-        _commandHistory.Clear();
-        _commandFuture.Clear();
+        _undoCommandStack.Clear();
+        _redoCommandStack.Clear();
     }
 
     public void Undo()
     {
-        if (_commandHistory.Count > 0)
+        if (_undoCommandStack.Count > 0)
         {
-            ICommand command = _commandHistory.Pop();
+            ICommand command = _undoCommandStack.Pop();
             command.Undo();
 
-            _commandFuture.Push(command);
+            _redoCommandStack.Push(command);
             CountChanged?.Invoke();
         }
     }
 
     public void Redo()
     {
-        if (_commandFuture.Count > 0)
+        if (_redoCommandStack.Count > 0)
         {
-            ICommand command = _commandFuture.Pop();
+            ICommand command = _redoCommandStack.Pop();
             command.Execute();
-            _commandHistory.Push(command);
+            _undoCommandStack.Push(command);
             CountChanged?.Invoke();
         }
     }
