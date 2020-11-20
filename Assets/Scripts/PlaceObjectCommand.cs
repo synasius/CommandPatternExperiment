@@ -1,25 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class PlaceCubeCommand : ICommand
+public class PlaceObjectCommand : ICommand
 {
     private Vector3 _position;
     private Color _color;
-    private GameObject _cubePrefab;
+    private GameObject _prefab;
 
     private GameObject _instancedCube;
 
-    public PlaceCubeCommand(Vector3 position, Color color, GameObject cubePrefab)
+    public PlaceObjectCommand(Vector3 position, Color color, GameObject prefab)
     {
         _position = position;
         _color = color;
-        _cubePrefab = cubePrefab;
+        _prefab = prefab;
     }
 
     public void Execute()
     {
-        _instancedCube = CubePlacer.PlaceCube(_position, _color, _cubePrefab);
+        _instancedCube = ObjectPlacer.PlaceObject(_position, _color, _prefab);
     }
 
     public void Undo()
@@ -29,7 +27,10 @@ public class PlaceCubeCommand : ICommand
             GameObject.Destroy(_instancedCube);
             _instancedCube = null;
         }
+    }
 
-        Debug.Assert(_instancedCube == null);
+    public bool IsUndoable()
+    {
+        return true;
     }
 }
