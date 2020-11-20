@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InputPlane : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
     public GameObject cubePrefab;
     private Camera _mainCam;
@@ -15,7 +15,7 @@ public class InputPlane : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(0)) 
+        if (Input.GetMouseButtonDown(0))
         {
             Ray ray = _mainCam.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity))
@@ -25,6 +25,14 @@ public class InputPlane : MonoBehaviour
                 ICommand command = new PlaceCubeCommand(hitInfo.point, c, cubePrefab);
                 CommandInvoker.AddCommand(command);
             }
+        }
+        else if (Input.GetKeyDown(KeyCode.Z))
+        {
+            CommandInvoker.Undo();
+        }
+        else if (Input.GetKeyDown(KeyCode.R))
+        {
+            CommandInvoker.Redo();
         }
     }
 }

@@ -29,35 +29,26 @@ public class CommandInvoker : MonoBehaviour
 
             _commandHistory.Push(command);
             _commandFuture.Clear();
-            Log();
-        }
-        else
-        {
-            if (Input.GetKeyDown(KeyCode.Z))
-            {
-                if (_commandHistory.Count > 0)
-                {
-                    ICommand command = _commandHistory.Pop();
-                    command.Undo();
-                    _commandFuture.Push(command);
-                    Log();
-                }
-            }
-            else if (Input.GetKeyDown(KeyCode.R))
-            {
-                if (_commandFuture.Count > 0)
-                {
-                    ICommand command = _commandFuture.Pop();
-                    command.Execute();
-                    _commandHistory.Push(command);
-                    Log();
-                }
-            }
         }
     }
 
-    private void Log()
+    public static void Undo()
     {
-        Debug.Log("History: " + _commandHistory.Count + " | Future: " + _commandFuture.Count);
+        if (_commandHistory.Count > 0)
+        {
+            ICommand command = _commandHistory.Pop();
+            command.Undo();
+            _commandFuture.Push(command);
+        }
+    }
+
+    public static void Redo()
+    {
+        if (_commandFuture.Count > 0)
+        {
+            ICommand command = _commandFuture.Pop();
+            command.Execute();
+            _commandHistory.Push(command);
+        }
     }
 }
