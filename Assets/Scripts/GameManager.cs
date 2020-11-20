@@ -4,7 +4,12 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject cubePrefab;
+    [SerializeField]
+    private GameObject _cubePrefab;
+
+    [SerializeField]
+    private UIManager _uiManager;
+
     private Camera _mainCam;
 
     void Start()
@@ -22,7 +27,7 @@ public class GameManager : MonoBehaviour
             {
                 Color c = new Color(Random.Range(0.5f, 1f), Random.Range(0.5f, 1f), Random.Range(0.5f, 1f));
 
-                ICommand command = new PlaceCubeCommand(hitInfo.point, c, cubePrefab);
+                ICommand command = new PlaceCubeCommand(hitInfo.point, c, _cubePrefab);
                 CommandInvoker.AddCommand(command);
             }
         }
@@ -34,5 +39,18 @@ public class GameManager : MonoBehaviour
         {
             CommandInvoker.Redo();
         }
+
+        // At the moment I need to update counter on every frame 
+        // in order to show correct values because command are enqueued 
+        // and then invoked. 
+        // An better option would be to send an event from Command invoker when 
+        // its state has changed.
+        UpdateUICounters();
+    }
+
+    private void UpdateUICounters()
+    {
+        _uiManager.SetUndoCount(CommandInvoker.UndoCount);
+        _uiManager.SetRedoCount(CommandInvoker.RedoCount);
     }
 }

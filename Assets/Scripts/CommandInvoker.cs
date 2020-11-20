@@ -8,6 +8,15 @@ public class CommandInvoker : MonoBehaviour
     private static Stack<ICommand> _commandHistory;
     private static Stack<ICommand> _commandFuture;
 
+    public static int UndoCount
+    {
+        get { return _commandHistory.Count; }
+    }
+    public static int RedoCount
+    {
+        get { return _commandFuture.Count; }
+    }
+
     public static void AddCommand(ICommand command)
     {
         _commandBuffer.Enqueue(command);
